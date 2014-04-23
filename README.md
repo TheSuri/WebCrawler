@@ -2,11 +2,12 @@
 
 ###Student Information
 **Developer 1**:
-  + Name: Tommy Trojan
-  + USC Email: ttrojan@usc.edu
-  + USC ID: 0123456789
+  + Name: Gyan Neil SUri
+  + USC Email: gsuri@usc.edu
+  + USC ID: 7377104586
 
 **Developer 2**:
-  + Name: Traveler VII
-  + USC Email: traveler@usc.edu
+  + Name: Melanie Shaul
+  + USC Email: mshaul@usc.edu
   + USC ID: 9876543210
+
