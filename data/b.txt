@@ -1,0 +1,2 @@
+(hi)[data/a.txt]
+(hi)[data/e.txt]
