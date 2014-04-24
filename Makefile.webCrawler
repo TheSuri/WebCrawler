@@ -1,0 +1,12 @@
+CC = g++
+CFLAGS = -g -Wall
+
+all: webCrawler
+
+webCrawler: webCrawler.o
+	    $(CC) -o $@ $^ $(CFLAGS)
+
+.PHONY: clean
+
+clean:
+	 rm -f *.o *~
