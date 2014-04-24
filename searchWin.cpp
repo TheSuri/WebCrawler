@@ -8,8 +8,11 @@
 #include "searchWin.h"
 #include "WebPage.h"
 #include "fileWin.h"
+#include "Ad.h"
 #include <QListWidget>
 #include <QRadioButton>
+#include <QMessageBox>
+#include <QCloseEvent>
 
 
 using namespace std;
@@ -25,6 +28,7 @@ searchWin::searchWin(QWidget* parent): QWidget (parent) { //constructor
   wordSearch = new QRadioButton("single word");
   searchText = new QLineEdit;
   fileWindow = new fileWin;
+  adMessage = new QMessageBox;
   sort = new QLabel("Sort by:");
   alphaSort = new QRadioButton("Alphabetically");
   rankSort = new QRadioButton("Relevance");
@@ -48,18 +52,22 @@ searchWin::searchWin(QWidget* parent): QWidget (parent) { //constructor
   searchLineLayout->addRow(alphaSort, rankSort);
 
   file_list = new QListWidget;
+  ad_list = new QListWidget;
   
 
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addLayout(searchLineLayout);
   mainLayout->addWidget(statusLabel);
   mainLayout->addWidget(file_list);
+  mainLayout->addWidget(ad_list);
   mainLayout->addWidget(quitButton);
 
   //connect button signals to slots
   connect(searchButton, SIGNAL(clicked()), this, SLOT(searchClicked()));
   connect (quitButton, SIGNAL(clicked()), this, SLOT(quitClicked()));
   connect(file_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(openFileWin(QListWidgetItem*)));
+  connect(ad_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(openAdWin(QListWidgetItem*)));
+  connect(ad_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(billCompany(QListWidgetItem*)));
   connect(fileWindow, SIGNAL(fileWinClicked(QListWidgetItem*)), this, SLOT(openFileWin(QListWidgetItem*)));
 
   setLayout(mainLayout);
@@ -73,15 +81,18 @@ searchWin::~searchWin() {
   delete file_list;
   delete fileWindow;
   ItemstoWebpages.clear();
+  ItemstoAds.clear();
 }
 
 void searchWin::searchClicked() {
   //clear the map of list widgets to webpages
   ItemstoWebpages.clear();
+  ItemstoAds.clear();
 
   //clear the file_list if any previous searches are there
   //this deletes all the listwidget items also
  file_list->clear();
+ ad_list->clear();
 
   //get the search query
    string search_query = searchText->text().toStdString();
@@ -98,10 +109,15 @@ void searchWin::searchClicked() {
 
 void searchWin::quitClicked() {
   fileWindow->close();
-  emit exit();
+  emit exit(companyBills);
   close();
 }
 
+void searchWin::closeEvent(QCloseEvent *event) {
+
+  emit exit(companyBills);
+  event->accept();
+}
 
 void searchWin::addToFileList(WebPage* webpage) {
  
@@ -114,6 +130,15 @@ void searchWin::addToFileList(WebPage* webpage) {
   file_list->insertItem(0,newItem);
 }
 
+void searchWin::addToAdList(Ad* ad) {
+  QListWidgetItem *newItem = new QListWidgetItem;
+  newItem->setText(QString::fromStdString(ad->getCompany()));
+
+  pair<QListWidgetItem*, Ad*> pair(newItem, ad);
+  ItemstoAds.insert(pair);
+  ad_list->insertItem(0,newItem);
+
+}
 
 void searchWin::setResultStatus(int status) {
   if (status == -1) { //invalid query
@@ -139,4 +164,35 @@ void searchWin::openFileWin(QListWidgetItem *item) {
   }
 
   fileWindow->show();
+}
+
+
+void searchWin::openAdWin(QListWidgetItem *item) {
+
+  QString message("You have visited an advertisement for ");
+  message += item->text();
+
+
+  adMessage->setText(message); 
+
+  adMessage->exec();
+
+}
+
+
+void searchWin::billCompany(QListWidgetItem *item) {
+ map < QListWidgetItem*, Ad*>::iterator it = ItemstoAds.find(item);
+ if (it!= ItemstoAds.end()) { //item is found
+   
+  pair< map<string,float>::iterator, bool> ret;
+ //try inserting the company with its bid to the map
+ ret = companyBills.insert(pair< string, float>(it->second->getCompany(), it->second->getBid()));
+    if (ret.second == false) { //if company is already being billed
+      //add extra cost to existing bill
+      companyBills[it->second->getCompany()] += it->second->getBid();
+    }
+
+  }
+
+
 }

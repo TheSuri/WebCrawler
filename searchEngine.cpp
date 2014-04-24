@@ -13,6 +13,7 @@
 #include "msort.h"
 #include <vector>
 #include "comp.h"
+#include "Ad.h"
 
 searchEngine::searchEngine() {
 
@@ -29,13 +30,13 @@ searchEngine::searchEngine() {
 
 }
 
-searchEngine::searchEngine(string filename, string adfile) {
+searchEngine::searchEngine(string filename, string adfile, string billfile) {
    window = new searchWin;
   openWebPages(filename);
   openAds(adfile);
+  billFile = billfile;
  connect(window, SIGNAL(searchReady()), this, SLOT(search()));
- connect(window, SIGNAL(exit()), this, SLOT(searchExit()));
- //connect(this, SIGNAL(search()), this, SLOT(printResults()));
+ connect(window, SIGNAL(exit(map<string,float>)), this, SLOT(searchExit(map<string,float>)));
   valid_search = true;
   results_found = true;
 
@@ -137,33 +138,37 @@ void searchEngine::openAds(string filename) {
   string input;
   string keyword;
   float bid;
-  string company;
 
-  map< string, Set<string> > keywordsToCompanies;
-  map< pair<string, string>, float> adsToBids;
+
+  //map< string, Set<Ad*> > keywordsToAds;
+  int numAds;
+  ifile >> numAds;
 
   while(getline(ifile, input)) {
+    string company = "";
     stringstream ss(input);
     ss >> keyword;
     caseLower(keyword);
     ss >> bid;
-    company = ss.str();
-
-    Set<string> companiesForWord;
-    companiesForWord.insert(company);
-    
-    pair< map<string,Set<string> >::iterator, bool> ret;
-    //try inserting the keyword into the map
-    //won't throw an exception, just won't add if word already exists in map
-    ret = keywordsToCompanies.insert(pair< string, Set<string> >(keyword,companiesForWord));
-    if (ret.second == false) { //if keyword was already added to the Map
-      //add the company to the keyword's associated Set<string>
-      keywordsToCompanies[keyword].insert(company);
+    //give rest of the stringstream to "company"
+    while (ss.tellg() != -1) {
+      string concat;
+      ss >> concat;
+      company += concat;
     }
 
-    //add the pair of company and keyword to map- pair to bid
-    //guaranteed to be no duplicates of companies and keywords
-    adsToBids.insert(pair< pair<string, string> , float>(pair<string, string>(keyword, company), bid));
+    Ad* newad = new Ad(company, keyword, bid);
+    Set<Ad*> adsForWord;
+    adsForWord.insert(newad);
+    
+    pair< map<string,Set<Ad*> >::iterator, bool> ret;
+    //try inserting the keyword into the map
+    //won't throw an exception, just won't add if word already exists in map
+    ret = keywordsToAds.insert(pair< string, Set<Ad*> >(keyword,adsForWord));
+    if (ret.second == false) { //if keyword was already added to the Map
+      //add the company to the keyword's associated Set<string>
+      keywordsToAds[keyword].insert(newad);
+    }
    
     
   }// end of while loop
@@ -174,6 +179,8 @@ void searchEngine::openAds(string filename) {
 void searchEngine::search() { 
  
   Set<WebPage*> searchResults;
+  Set<Ad*> srelevantAds;
+  vector<Ad*> relevantAds;
   valid_search = true;
   results_found = true;
   string search_line = window->getSearchQuery();
@@ -207,11 +214,22 @@ void searchEngine::search() {
   //searchResults should be an empty set
       }
     }
+
+    //now find all relevant ads
+
+    //find the set of companies that have ads for the keyword;
+    // Set<string> companies = keywordsToCompanies[word];
+    Set<Ad*> ads = keywordsToAds[word];
+
+    //add each pair of company and keyword to the vector of relevantAds
+    for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
+      srelevantAds.insert(*it);
+    }
     
   }
   
   //CASE 2:
-  else if (window->and_Search() ){
+  else if (window->and_Search() ){ //user wants an AND search
     vector<string> queryWords;
     bool error = false;
     char ch;
@@ -270,6 +288,20 @@ void searchEngine::search() {
     else {
       valid_search = false;
     }
+
+    //now find all relevant ads
+
+    //for each word in the queryWords vector:
+    for (int i=0; i<(int)queryWords.size(); i++) {
+      //find the set of Ads that have ads for the keyword;
+      Set<Ad*> ads = keywordsToAds[queryWords[i]];
+      
+      //add each ad to the set of srelevantAds (for no duplicates)
+      for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
+	srelevantAds.insert(*it);
+      }
+    }
+
   }
   
   //CASE 3:
@@ -337,6 +369,18 @@ void searchEngine::search() {
     else {
       valid_search = false;
     }
+    //now find all relevant ads
+
+    //for each word in the queryWords vector:
+    for (int i=0; i<(int)queryWords.size(); i++) {
+      //find the set of Ads that have ads for the keyword;
+      Set<Ad*> ads = keywordsToAds[queryWords[i]];
+      
+      //add each ad to the vector of relevantAds
+      for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
+	srelevantAds.insert(*it);
+      }
+    }
     
   }
   
@@ -351,6 +395,11 @@ void searchEngine::search() {
   for(Set<WebPage*>::iterator it = searchResults.begin(); it!=searchResults.end(); ++it){
     search.push_back(*it);
     i++;
+  }
+
+  //convert set of Ad* to vector for sorting
+for(Set<Ad*>::iterator it = srelevantAds.begin(); it!=srelevantAds.end(); ++it){
+    relevantAds.push_back(*it);
   }
 
   if (window->sortByRank()) { //user wants to sort by rank
@@ -371,12 +420,14 @@ void searchEngine::search() {
     ms.mergeSort(search, compR);
 
   }
-  // cout << "ALL" << endl;
-  // for(Set<WebPage*>::iterator it = set_allWebPages.begin(); it!=set_allWebPages.end(); ++it){
-  //   cout << (*it)->filename() << " " << (*it)->getOldRank() << endl;
-  // }
-  //search is finished, so print results
-  printResults(search);
+
+  //sort the relevantAds by highest bid
+  //mergesort
+  MSort<Ad*, AdComp> ms;
+  AdComp comp;
+  ms.mergeSort(relevantAds, comp);
+
+  printResults(search, relevantAds);
 
 }
 
@@ -441,7 +492,7 @@ void searchEngine::search() {
   }
 
 
-void searchEngine::printResults(vector<WebPage*> results) {
+void searchEngine::printResults(vector<WebPage*> results, vector<Ad*> ads) {
 
   if (!valid_search) {
     //indicate invalid search
@@ -453,14 +504,18 @@ void searchEngine::printResults(vector<WebPage*> results) {
   }
   else {
     window->setResultStatus(results.size());
-    //for (Set<WebPage*>::iterator it = results.begin(); it!= results.end(); ++it) {
-    //for(unsigned int i=0, i<results.size(); i++){
+    
+    //iterate over results and add to file list
     while(!results.empty()){
       window->addToFileList(results.back());
       results.pop_back();
     }
-    //print results to the screen
-    //iterate over results
+
+    while(!ads.empty()) {
+      window->addToAdList(ads.back());
+      ads.pop_back();
+    }
+
   }
   
 }
@@ -542,6 +597,18 @@ Set <WebPage*> searchEngine::pageRank(Set <WebPage*> searchResults) {
 }
 
 
-void searchEngine::searchExit() {
+void searchEngine::searchExit(map<string,float> bills) {
+  //iterate over bills and write to file
+
+  ofstream ofile(billFile.c_str());
+
+  for (map<string,float>::iterator it = bills.begin(); it!= bills.end(); ++it) {
+    ofile << it->first << endl;
+    ofile << it->second << endl;
+    ofile << endl;
+  }
+
+  ofile.close();
+
   close();
 }
