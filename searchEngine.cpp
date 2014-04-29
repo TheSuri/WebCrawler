@@ -151,11 +151,18 @@ void searchEngine::openAds(string filename) {
     caseLower(keyword);
     ss >> bid;
     //give rest of the stringstream to "company"
-    while (ss.tellg() != -1) {
-      string concat;
-      ss >> concat;
-      company += concat;
+    //while (ss.tellg() != -1) {
+    //string concat;
+    char ch = ss.peek();
+    while (isspace(ch)) {
+      ch = ss.get();
+      ch = ss.peek();
     }
+      getline(ss, company);
+      // ss >> concat;
+      //company += concat;
+
+      // }
 
     Ad* newad = new Ad(company, keyword, bid);
     Set<Ad*> adsForWord;
@@ -291,18 +298,40 @@ void searchEngine::search() {
 
     //now find all relevant ads
 
+ //make a map of srelevantAdsMap
+      map<string, Ad*> companiesToAds;
+
     //for each word in the queryWords vector:
     for (int i=0; i<(int)queryWords.size(); i++) {
       //find the set of Ads that have ads for the keyword;
       Set<Ad*> ads = keywordsToAds[queryWords[i]];
       
       //add each ad to the set of srelevantAds (for no duplicates)
-      for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
-	srelevantAds.insert(*it);
+      // for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
+	//check that no duplicate company names are added:
+      //	srelevantAds.insert(*it);
+
+      //}
+
+
+      for (Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it) {
+	pair< map<string, Ad*>::iterator, bool> ret = companiesToAds.insert(pair<string, Ad*>((*it)->getCompany(), *it));
+	if (ret.second == false) { //company already added to list of bids
+	  if ((*it)->getBid() > (companiesToAds[(*it)->getCompany()])->getBid()) {
+	    //replace bid in map to *it
+	    companiesToAds[(*it)->getCompany()] = *it;
+	  }
+	}
       }
     }
 
+    //convert the map to a set srevelantAds
+    for (map< string, Ad*>::iterator it = companiesToAds.begin(); it!= companiesToAds.end(); ++it) {
+      srelevantAds.insert(it->second);
+
+    }
   }
+
   
   //CASE 3:
   else if (window->or_Search() ){
@@ -370,18 +399,30 @@ void searchEngine::search() {
       valid_search = false;
     }
     //now find all relevant ads
+ //make a map of srelevantAdsMap
+      map<string, Ad*> companiesToAds;
 
     //for each word in the queryWords vector:
     for (int i=0; i<(int)queryWords.size(); i++) {
       //find the set of Ads that have ads for the keyword;
       Set<Ad*> ads = keywordsToAds[queryWords[i]];
-      
-      //add each ad to the vector of relevantAds
-      for(Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it){
-	srelevantAds.insert(*it);
+   
+      for (Set<Ad*>::iterator it = ads.begin(); it!=ads.end(); ++it) {
+	pair< map<string, Ad*>::iterator, bool> ret = companiesToAds.insert(pair<string, Ad*>((*it)->getCompany(), *it));
+	if (ret.second == false) { //company already added to list of bids
+	  if ((*it)->getBid() > (companiesToAds[(*it)->getCompany()])->getBid()) {
+	    //replace bid in map to *it
+	    companiesToAds[(*it)->getCompany()] = *it;
+	  }
+	}
       }
     }
-    
+
+    //convert the map to a set srevelantAds
+    for (map< string, Ad*>::iterator it = companiesToAds.begin(); it!= companiesToAds.end(); ++it) {
+      srelevantAds.insert(it->second);
+
+    }
   }
   
   else { //query did not match a case
