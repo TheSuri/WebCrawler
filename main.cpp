@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <iostream>
 #include "searchEngine.h"
 
 using namespace std;
@@ -17,5 +18,6 @@ int main(int argc, char* argv[])
   myengine.show();
 
   return myapp.exec();
+
   return 0;
 }
