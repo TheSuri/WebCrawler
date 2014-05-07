@@ -11,6 +11,13 @@
   + USC Email: mshaul@usc.edu
   + USC ID: 2054463628
 
+
+Search Engine:
+compile instructions: do "qmake" and "make" (do NOT run qmake -project)
+
+run instructions: ./team_project_128 <webpage input file> <advertisement input file> <advertisement billing output file>
+
+
 Advertisements:
 
 You must close the pop-up window advertisment before continuing with the Qt GUI.

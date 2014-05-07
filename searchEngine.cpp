@@ -164,6 +164,15 @@ void searchEngine::openAds(string filename) {
 
       // }
 
+      //remove any trailing whitespace from company name
+      //stringstream ss(company)
+      //ss.seekg(1, ss.end)
+      //char ch = ss.peek();
+      //while (ch == " ") {
+      //remove it
+      //}
+ 
+
     Ad* newad = new Ad(company, keyword, bid);
     Set<Ad*> adsForWord;
     adsForWord.insert(newad);
