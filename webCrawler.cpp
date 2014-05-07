@@ -337,7 +337,7 @@ void formatlinks()
         break;
       }
     }
-   cout<<"in file "<<currfile<<endl;
+   //cout<<"in file "<<currfile<<endl;
    while(ifile)
    {
     ifile>>buffer;
@@ -381,5 +381,11 @@ int main(int argc, char const *argv[])
     crawldeeper(); //Goes deeper into each link it just crawled. and crawls those outgoing links
     cout<<endl<<"Now formatting all links..."<<endl;
     formatlinks();
+    cout<<"done."<<endl;
+    ofstream ofile("database/allfiles.txt", ios::out);
+    for(int i=1; i<=numfile; i++)
+    {
+      ofile<<i<<".txt"<<endl;
+    }
   return 0;
 }
