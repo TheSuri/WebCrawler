@@ -12,10 +12,25 @@
   + USC ID: 2054463628
 
 
+
+WebCrawler:
+
+compile: NOTE: you must have curl on your VM in order to run the webcrawler 
+run make -f Makefile.webCrawler
+
+run instructions: ./webCrawler
+the terminal will prompt you for the seed file (which should be in the current directory) - we have provided a "seed.txt" file for your convenience
+the webcrawler will output textfiles of the webpages and a "allfiles.txt" with the names of all webpages text files in the "database" folder
+
+
 Search Engine:
 compile instructions: do "qmake" and "make" (do NOT run qmake -project)
 
 run instructions: ./team_project_128 <webpage input file> <advertisement input file> <advertisement billing output file>
+NOTE: the webpage input file we provided is database/allfiles.txt
+
+so run:
+./team_project_128 database/allfiles.txt <advertisement file> <advertisement billing output file>
 
 
 Advertisements:
