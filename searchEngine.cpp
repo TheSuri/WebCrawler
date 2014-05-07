@@ -158,20 +158,22 @@ void searchEngine::openAds(string filename) {
       ch = ss.get();
       ch = ss.peek();
     }
+
+   
       getline(ss, company);
+
       // ss >> concat;
       //company += concat;
 
       // }
+      int size = company.size();
+      char last = company[size-1];
+      while (isspace(last)) {
+	company = company.substr(0, company.length() - 1);
 
-      //remove any trailing whitespace from company name
-      //stringstream ss(company)
-      //ss.seekg(1, ss.end)
-      //char ch = ss.peek();
-      //while (ch == " ") {
-      //remove it
-      //}
- 
+	size = company.size();
+	last = company[size-1];
+      }
 
     Ad* newad = new Ad(company, keyword, bid);
     Set<Ad*> adsForWord;
