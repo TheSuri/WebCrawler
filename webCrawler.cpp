@@ -385,7 +385,7 @@ int main(int argc, char const *argv[])
     ofstream ofile("database/allfiles.txt", ios::out);
     for(int i=1; i<=numfile; i++)
     {
-      ofile<<i<<".txt"<<endl;
+      ofile<<"database/"<<i<<".txt"<<endl;
     }
   return 0;
 }
