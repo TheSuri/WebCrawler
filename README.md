@@ -49,7 +49,14 @@ Advertisements:
 You must close the pop-up window advertisment before continuing with the Qt GUI.
 In the output file, only companies with a non-zero bill will be shown.
 
+Advertisements will only appear if the search results yielded results. 
+We did not provide an adveristement input file.
+
 **NOTE: in order to get the correct output results for the company billing info, you must quit the search engine via the QUIT BUTTON, not the X button in the top left corner.
+
+
+
+
 
 
 NOTE: The repository does not contain folders for organization because we felt there was no logical way to organize it besides the way we have it.
