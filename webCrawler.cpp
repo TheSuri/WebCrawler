@@ -11,7 +11,7 @@
 #include <deque>
 #include <set>
 using namespace std;
-int numfile =0;
+int numfile =0 ,nummaxfiles;
 string data;
 set <string> linksforcrawl;
 void setlinks(string data4, vector <string> tags, string site);
@@ -65,7 +65,7 @@ void crawldeeper()
   cout<<endl<<"Now crawling deeper into each of the outgoing links of seed file"<<endl;
   cout<<linksforcrawl.size();
   
-  while(linksforcrawl.size()!=0 && numfile < 70)
+  while(linksforcrawl.size()!=0 && numfile < nummaxfiles)
   {
     ifstream allsitesin("AllSites.txt",  ios::in );
     string allsitescrawled="";
@@ -376,6 +376,8 @@ int main(int argc, char const *argv[])
     cout<<"Please enter name of seed file. (seed file should be in same directory as this program)"<<endl;  
     string seed;
     cin>>seed;
+    cout<<endl<<"Please enter the total number of links to parse. (70 is an optimal number as tested)"<<endl;
+    cin>>nummaxfiles;
     cout<<"Please wait while the program loads webpages from the internet...(30 seconds to 3 minutes)"<<endl;
     webcrawler(seed);
     crawldeeper(); //Goes deeper into each link it just crawled. and crawls those outgoing links
