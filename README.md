@@ -36,11 +36,11 @@ Do NOT include the following websites in the seed.txt: http://google.com (google
 Search Engine:
 compile instructions: do "qmake" and "make" (do NOT run qmake -project)
 
-run instructions: ./team_project_128 <webpage input file> <advertisement input file> <advertisement billing output file>
+run instructions: ./team_project_128 (webpage input file) (advertisement input file) (advertisement billing output file)
 NOTE: the webpage input file we provided is database/allfiles.txt
 
 so run:
-./team_project_128 database/allfiles.txt <advertisement file> <advertisement billing output file>
+./team_project_128 database/allfiles.txt (advertisement file) (advertisement billing output file)
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,14 @@ Advertisements:
 You must close the pop-up window advertisment before continuing with the Qt GUI.
 In the output file, only companies with a non-zero bill will be shown.
 
+Advertisements will only appear if the search results yielded results. 
+We did not provide an adveristement input file.
+
 **NOTE: in order to get the correct output results for the company billing info, you must quit the search engine via the QUIT BUTTON, not the X button in the top left corner.
+
+
+
+
 
 
 NOTE: The repository does not contain folders for organization because we felt there was no logical way to organize it besides the way we have it.
