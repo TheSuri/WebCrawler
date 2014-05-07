@@ -55,32 +55,6 @@ void webcrawler(string seedFile)
         string opfile= database+fileNum+".txt";
         allsitesout<<site<<' '<<opfile<<endl;
         ifstream textfile(opfile.c_str());
-       /* while(linksforcrawl.size()!=0)
-        {
-        ++::numfile;
-        string str;
-        while(str!="AllOutgoingLinks:")
-          {
-            str="";
-            textfile>>str;
-          }  
-        if(str=="AllOutgoingLinks:")
-        {
-        textfile>>str;
-          for(int i=0; i<9; i++)
-          {
-            ++::numfile;
-            cout<<endl<<"Downloading and parsing webpage "<<numfile<<endl;
-            crawl(str, ::numfile);
-            ss<<::numfile;
-            ss>>fileNum;
-            ss.clear();
-            opfile= database+fileNum+".txt";
-            allsites<<str<<' '<<opfile<<endl;
-          }
-      }*/
-      
-
       }
    }
    allsitesout.close();
@@ -105,16 +79,13 @@ void crawldeeper()
     allsitesin.close();
     set<string>::iterator outlinksit = linksforcrawl.begin();
     advance(outlinksit, rand()%linksforcrawl.size());
-    //cout<<allsitescrawled<<endl;
     if(allsitescrawled.find(*outlinksit)!=-1)
       {
-        //cout<<"not parsing "<<*outlinksit;
         linksforcrawl.erase(*outlinksit);
         continue;
       }
     else
     {
-      //cout<<"OOOOO KIL EM";
       ofstream allsitesout("AllSites.txt",  ios::out |ios::app );
       ++::numfile;
       cout<<endl<<"Downloading and parsing webpage "<<numfile<<endl;
@@ -223,7 +194,6 @@ void parse(string data, string site)
         j++;
       }
     }
-    //cout << endl << data4 << endl; 
     setlinks(data4, tags, site);
 }
 
@@ -238,7 +208,6 @@ void setlinks(string data4, vector <string> tags, string site)
       if(tag[0]=='a')
       {
       int found = tag.find(str2);
-      //cout<<tag<<endl<<endl<<endl<<endl<<endl;
       if(found!=-1)
       {
       bool flag=false;
@@ -373,7 +342,6 @@ void formatlinks()
    {
     ifile>>buffer;
     int k= allsites.find(buffer);
-    cout<<"After searching for "<<buffer<<" in allsites.txt k value "<<k<<endl;
     if(k!=-1)
     {
       str+='['+buffer+']'+'(';
@@ -411,9 +379,7 @@ int main(int argc, char const *argv[])
     cout<<"Please wait while the program loads webpages from the internet...(30 seconds to 3 minutes)"<<endl;
     webcrawler(seed);
     crawldeeper(); //Goes deeper into each link it just crawled. and crawls those outgoing links
-    cout<<endl<<"Now formatting all links... any key to continue"<<endl;
-    char y;
-    cin>>y;
+    cout<<endl<<"Now formatting all links..."<<endl;
     formatlinks();
   return 0;
 }
