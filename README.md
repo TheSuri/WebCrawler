@@ -40,7 +40,7 @@ run instructions: ./team_project_128 (webpage input file) (advertisement input f
 NOTE: the webpage input file we provided is database/allfiles.txt
 
 so run:
-./team_project_128 database/allfiles.txt (advertisement file) )advertisement billing output file)
+./team_project_128 database/allfiles.txt (advertisement file) (advertisement billing output file)
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
