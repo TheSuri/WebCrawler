@@ -1,18 +1,3 @@
-##CSCI 104 Team Project Repository
-
-###Student Information
-**Developer 1**:
-  + Name: Gyan Neil Suri
-  + USC Email: gsuri@usc.edu
-  + USC ID: 7377104586
-
-**Developer 2**:
-  + Name: Melanie Shaul
-  + USC Email: mshaul@usc.edu
-  + USC ID: 2054463628
-
-----------------------------------------------------------------------------------------------------------------------------------------------
-
 WebCrawler:
 
 compile: NOTE: you must have curl on your VM in order to run the webcrawler 
@@ -29,8 +14,6 @@ the webcrawler will output textfiles with the first line of the textfile being t
 Do NOT include the following websites in the seed.txt: http://google.com (google is heavily scripted and therefore doesn't work as well - the webcrawler will still function if you include a google website, but there will be a lot of junk in the output contents of webpage).
 
 *in the seed file, when adding webpages make sure you use the complete http:// website name
-
-*Important: Occassionally the parsing and downloading of the webpages will stop due to curl (no fault of ours), and you may have to quit the process and run it again (usually won't happen, but just in case). Even if you run it with the same seed file, it should work the next time.
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 Search Engine:
